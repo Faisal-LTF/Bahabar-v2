@@ -35,6 +35,7 @@ class RoleSeeder extends Seeder
             'update event',
             'read event',
             'create event'
+
         ]);
 
         // Admin role with specific permissions

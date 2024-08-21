@@ -48,11 +48,19 @@ class CandidateController extends Controller
     {
         $events = Event::all();
 
-        return Inertia::render('Candidate/Create', [
-            'title' => 'Create Candidate',
-            'events' => $events,
+        // Debugging: Pastikan data event benar-benar ada
+        if ($events->isEmpty()) {
+            dd('No events found in the database.');
+        } else {
+            dd($events->toArray());  // Menampilkan data event yang diambil
+        }
+
+        return inertia('Candidates/Create', [
+            'events' => $events->toArray(),
         ]);
     }
+
+
 
     /**
      * Store a newly created candidate in storage.

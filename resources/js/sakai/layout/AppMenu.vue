@@ -21,7 +21,7 @@ const model = ref([
         // label: 'Events' (New Section for Events)
         items: [
             { label: 'Events', icon: 'pi pi-fw pi-calendar', to: '/events', can: 'read event' },
-            { label: 'Candidats', icon: 'pi pi-fw pi-calendar', to: '/candidats', can: 'read candidat' }
+            { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates', can: 'read candidate' }
         ]
     },
     {
