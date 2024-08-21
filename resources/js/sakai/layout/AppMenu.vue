@@ -8,18 +8,21 @@ const model = ref([
     },
     {
         // label: 'Master',
-        items: [{ label: 'User', icon: 'pi pi-fw pi-user', to: '/user', can:'read user' }]
+        items: [{ label: 'User', icon: 'pi pi-fw pi-user', to: '/user', can: 'read user' }]
     },
     {
         // label: 'Setting',
         items: [
-            { label: 'Role', icon: 'pi pi-fw pi-id-card', to: '/role', can:'read role' },
-            { label: 'Permission', icon: 'pi pi-fw pi-mobile', to: '/permission', class: 'rotated-icon', can:'read permission' }
+            { label: 'Role', icon: 'pi pi-fw pi-id-card', to: '/role', can: 'read role' },
+            { label: 'Permission', icon: 'pi pi-fw pi-mobile', to: '/permission', class: 'rotated-icon', can: 'read permission' }
         ]
     },
     {
         // label: 'Events' (New Section for Events)
-        items: [{ label: 'Events', icon: 'pi pi-fw pi-calendar', to: '/events', can:'read event' }]
+        items: [
+            { label: 'Events', icon: 'pi pi-fw pi-calendar', to: '/events', can: 'read event' },
+            { label: 'Candidats', icon: 'pi pi-fw pi-calendar', to: '/candidats', can: 'read candidat' }
+        ]
     },
     {
         items: [

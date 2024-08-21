@@ -10,6 +10,7 @@ use App\Http\Controllers\UserController;
 use Spatie\Permission\Models\Permission;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CandidateController;
 use App\Http\Controllers\PermissionController;
 
 /*
@@ -54,6 +55,15 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::get('/events/{event}/edit', [EventController::class, 'edit'])->name('event.edit');
     Route::patch('/events/{event}', [EventController::class, 'update'])->name('event.update');
     Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('event.destroy');
+
+
+    // Candidate routes
+    Route::get('/candidates', [CandidateController::class, 'index'])->name('candidates.index');
+    Route::get('/candidates/create', [CandidateController::class, 'create'])->name('candidates.create');
+    Route::post('/candidates', [CandidateController::class, 'store'])->name('candidates.store');
+    Route::get('/candidates/{candidate}/edit', [CandidateController::class, 'edit'])->name('candidates.edit');
+    Route::patch('/candidates/{candidate}', [CandidateController::class, 'update'])->name('candidates.update');
+    Route::delete('/candidates/{candidate}', [CandidateController::class, 'destroy'])->name('candidates.destroy');
 });
 
 Route::get('/form', function () {
