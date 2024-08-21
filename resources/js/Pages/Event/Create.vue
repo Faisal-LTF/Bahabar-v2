@@ -63,7 +63,7 @@ watchEffect(() => {
                 <div class="flex flex-col gap-2">
                     <label for="voting_type">Voting Type</label>
                     <Select id="voting_type" v-model="form.voting_type" :options="[
-                        { label: '-- PILIH --', value: '' },
+                        { label: 'PILIH', value: '' },
                         { label: 'Gratis', value: 'gratis' },
                         { label: 'Berbayar', value: 'berbayar' }
                     ]" optionLabel="label" optionValue="value" placeholder="Select Voting Type" />
