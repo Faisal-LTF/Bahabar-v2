@@ -33,5 +33,11 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'update event']);
         Permission::create(['name' => 'read event']);
         Permission::create(['name' => 'create event']);
+
+        // Permissions for Candidate
+        Permission::create(['name' => 'create candidate']);
+        Permission::create(['name' => 'read candidate']);
+        Permission::create(['name' => 'update candidate']);
+        Permission::create(['name' => 'delete candidate']);
     }
 }

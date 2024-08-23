@@ -2,30 +2,35 @@
 import { useForm } from "@inertiajs/vue3";
 import { watchEffect, ref, onMounted } from "vue";
 
+
 const props = defineProps({
     show: Boolean,
     title: String,
     events: {
         type: Array,
-        default: () => [], // Default to empty array
+        default: () => [],
     },
 });
 
-onMounted(() => {
-    console.log('Props:', props); // Memastikan props diterima dengan benar
-    console.log('Events:', props.events); // Memastikan events diterima dengan benar
-});
-
-
-
 const emit = defineEmits(["close"]);
+const events = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/candidates/create');
+        events.value = response.data; // Store the fetched events data
+        console.log('Events:', events.value); // Log the events to ensure data is fetched correctly
+    } catch (error) {
+        console.error('Error fetching events:', error);
+    }
+});
 
 const form = useForm({
     name: "",
     region: "",
     description: "",
-    event_id: null,  // Associate the candidate with an event
-    photo: null,  // Photo will be uploaded
+    event_id: null,
+    photo: null,
 });
 
 
@@ -73,7 +78,7 @@ watchEffect(() => {
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="event_id">Event</label>
-                    <Select v-model="form.event_id" :options="props.events" optionValue="id" optionLabel="name"
+                    <Select v-model="form.event_id" :options="events" optionValue="id" optionLabel="name"
                         placeholder="Select an Event" />
                     <small v-if="form.errors.event_id" class="text-red-500">{{ form.errors.event_id }}</small>
                 </div>

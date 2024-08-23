@@ -102,7 +102,8 @@ const searchCountry = (event) => {
                 <Textarea placeholder="Your Message" :autoResize="true" rows="3" cols="30" />
 
                 <div class="font-semibold text-xl">AutoComplete</div>
-                <AutoComplete v-model="selectedAutoValue" :suggestions="autoFilteredValue" optionLabel="name" placeholder="Search" dropdown multiple display="chip" @complete="searchCountry($event)" />
+                <AutoComplete v-model="selectedAutoValue" :suggestions="autoFilteredValue" optionLabel="name"
+                    placeholder="Search" dropdown multiple display="chip" @complete="searchCountry($event)" />
 
                 <div class="font-semibold text-xl">DatePicker</div>
                 <DatePicker :showIcon="true" :showButtonBar="true" v-model="calendarValue"></DatePicker>
@@ -177,10 +178,13 @@ const searchCountry = (event) => {
                 <Select v-model="dropdownValue" :options="dropdownValues" optionLabel="name" placeholder="Select" />
 
                 <div class="font-semibold text-xl">MultiSelect</div>
-                <MultiSelect v-model="multiselectValue" :options="multiselectValues" optionLabel="name" placeholder="Select Countries" :filter="true">
+                <MultiSelect v-model="multiselectValue" :options="multiselectValues" optionLabel="name"
+                    placeholder="Select Countries" :filter="true">
                     <template #value="slotProps">
-                        <div class="inline-flex items-center py-1 px-2 bg-primary text-primary-contrast rounded-border mr-2" v-for="option of slotProps.value" :key="option.code">
-                            <span :class="'mr-2 flag flag-' + option.code.toLowerCase()" style="width: 18px; height: 12px" />
+                        <div class="inline-flex items-center py-1 px-2 bg-primary text-primary-contrast rounded-border mr-2"
+                            v-for="option of slotProps.value" :key="option.code">
+                            <span :class="'mr-2 flag flag-' + option.code.toLowerCase()"
+                                style="width: 18px; height: 12px" />
                             <div>{{ option.name }}</div>
                         </div>
                         <template v-if="!slotProps.value || slotProps.value.length === 0">
@@ -189,7 +193,8 @@ const searchCountry = (event) => {
                     </template>
                     <template #option="slotProps">
                         <div class="flex items-center">
-                            <span :class="'mr-2 flag flag-' + slotProps.option.code.toLowerCase()" style="width: 18px; height: 12px" />
+                            <span :class="'mr-2 flag flag-' + slotProps.option.code.toLowerCase()"
+                                style="width: 18px; height: 12px" />
                             <div>{{ slotProps.option.name }}</div>
                         </div>
                     </template>

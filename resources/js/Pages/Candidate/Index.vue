@@ -3,7 +3,6 @@ import AppLayout from "@/sakai/layout/AppLayout.vue";
 import Create from "@/Pages/Candidate/Create.vue";
 import Edit from "@/Pages/Candidate/Edit.vue";
 import { usePage, useForm } from '@inertiajs/vue3';
-
 import { reactive, ref, watch } from "vue";
 import pkg from "lodash";
 import { router } from "@inertiajs/vue3";
@@ -62,18 +61,28 @@ watch(
         });
     }, 150)
 );
-
+// Fungsi untuk memformat tanggal
+const formatDate = (date) => {
+    const options = {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    return new Date(date).toLocaleDateString('en-GB', options).replace(",", " ");
+};
 </script>
 
 <template>
     <app-layout>
         <div class="card">
-            <Create :show="data.createOpen" @close="data.createOpen = false" :events="props.events"
-                :title="props.title" />
-            <Edit :show="data.editOpen" @close="data.editOpen = false" :events="props.events"
-                :candidate="data.candidate" :title="props.title" />
+            <Create :show="data.createOpen" @close="data.createOpen = false" :title="props.title" />
+            <Edit :show="data.editOpen" @close="data.editOpen = false" :event="data.event" :title="props.title" />
+
             <Button v-show="can(['create candidate'])" label="Create" @click="data.createOpen = true"
                 icon="pi pi-plus" />
+
             <DataTable lazy :value="candidates.data" paginator :rows="candidates.per_page"
                 :totalRecords="candidates.total" :first="(candidates.current_page - 1) * candidates.per_page"
                 @page="onPageChange" tableStyle="min-width: 50rem">
@@ -105,7 +114,6 @@ watch(
                         {{ slotProps.data.description }}
                     </template>
                 </Column>
-
                 <!-- New column for Photo -->
                 <Column field="photo" header="Photo">
                     <template #body="slotProps">
@@ -119,8 +127,16 @@ watch(
                         {{ slotProps.data.event.name }}
                     </template>
                 </Column>
-                <Column field="created_at" header="Created"></Column>
-                <Column field="updated_at" header="Updated"></Column>
+                <Column field="created_at" header="Created">
+                    <template #body="slotProps">
+                        {{ formatDate(slotProps.data.created_at) }}
+                    </template>
+                </Column>
+                <Column field="updated_at" header="Updated">
+                    <template #body="slotProps">
+                        {{ formatDate(slotProps.data.updated_at) }}
+                    </template>
+                </Column>
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
                         <Button v-show="can(['update candidate'])" icon="pi pi-pencil" outlined rounded class="mr-2"

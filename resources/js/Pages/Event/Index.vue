@@ -80,8 +80,9 @@ const formatDate = (date) => {
         <div class="card">
             <Create :show="data.createOpen" @close="data.createOpen = false" :title="props.title" />
             <Edit :show="data.editOpen" @close="data.editOpen = false" :event="data.event" :title="props.title" />
-            <Button v-show="can(['create event'])" label="Create Event" @click="data.createOpen = true"
-                icon="pi pi-plus" />
+
+            <Button v-show="can(['create event'])" label="Create" @click="data.createOpen = true" icon="pi pi-plus" />
+
             <DataTable lazy :value="events.data" paginator :rows="events.per_page" :totalRecords="events.total"
                 :first="(events.current_page - 1) * events.per_page" @page="onPageChange" tableStyle="min-width: 50rem">
                 <template #header>
@@ -123,18 +124,18 @@ const formatDate = (date) => {
                             (data.editOpen = true),
                             (data.event = slotProps.data)" />
                         <Button v-show="can(['delete event'])" icon="pi pi-trash" outlined rounded severity="danger"
-                            @click="deleteDialog.value = true; data.event = slotProps.data" />
+                            @click="deleteDialog = true; data.event = slotProps.data" />
                     </template>
                 </Column>
             </DataTable>
 
-            <Dialog v-model:visible="deleteDialog.value" :style="{ width: '450px' }" header="Confirm" :modal="true">
+            <Dialog v-model:visible="deleteDialog" :style="{ width: '450px' }" header="Confirm" :modal="true">
                 <div class="flex items-center gap-4">
                     <i class="pi pi-exclamation-triangle !text-3xl" />
                     <span v-if="data.event">Are you sure you want to delete <b>{{ data.event.name }}</b>?</span>
                 </div>
                 <template #footer>
-                    <Button label="No" icon="pi pi-times" text @click="deleteDialog.value = false" />
+                    <Button label="No" icon="pi pi-times" text @click="deleteDialog = false" />
                     <Button label="Yes" icon="pi pi-check" @click="deleteData" />
                 </template>
             </Dialog>

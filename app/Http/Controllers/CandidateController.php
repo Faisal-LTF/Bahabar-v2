@@ -46,21 +46,9 @@ class CandidateController extends Controller
      */
     public function create()
     {
-        $events = Event::all();
-
-        // Debugging: Pastikan data event benar-benar ada
-        if ($events->isEmpty()) {
-            dd('No events found in the database.');
-        } else {
-            dd($events->toArray());  // Menampilkan data event yang diambil
-        }
-
-        return inertia('Candidates/Create', [
-            'events' => $events->toArray(),
-        ]);
+        $events = Event::all(['id', 'name']);
+        return response()->json($events); // Return as JSON
     }
-
-
 
     /**
      * Store a newly created candidate in storage.
