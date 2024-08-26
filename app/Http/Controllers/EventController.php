@@ -33,30 +33,29 @@ class EventController extends Controller
 
         // Ambil nama provinsi dan kabupaten/kota dari API
         $events->transform(function ($event) {
-
-            // dd(
-            //     'Event ID: ' . $event->id,
-            //     'Regional ID: ' . $event->regional_id,
-            //     'Regency ID: ' . $event->regency_id,
-            // );
-            // Ambil data regional
-            $regionalResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/provinces/{$event->regional_id}.json");
+            // Ambil data semua provinsi
+            $regionalResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json");
             if ($regionalResponse->status() == 200) {
-                $regional = $regionalResponse->json();
-                $event->regional_name = $regional['name'] ?? 'N/A';
+                $allProvinces = $regionalResponse->json();
+
+                // Cari nama provinsi berdasarkan ID
+                $selectedProvince = collect($allProvinces)->firstWhere('id', $event->regional_id);
+                $event->regional_name = $selectedProvince['name'] ?? 'N/A';
             } else {
-                $event->regional_name = 'N/A'; // ID tidak ditemukan atau error lain
+                $event->regional_name = 'N/A'; // Jika data tidak ditemukan atau terjadi error
             }
 
-            // Ambil data regency
-            $regencyResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regencies/{$event->regency_id}.json");
-            if ($regencyResponse->status() == 200) {
-                $regency = $regencyResponse->json();
-                $event->regency_name = $regency['name'] ?? 'N/A';
-            } else {
-                $event->regency_name = 'N/A'; // ID tidak ditemukan atau error lain
-            }
+            // Ambil data semua kabupaten/kota berdasarkan ID provinsi
+            $regenciesResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regencies/{$event->regional_id}.json");
+            if ($regenciesResponse->status() == 200) {
+                $allRegencies = $regenciesResponse->json();
 
+                // Cari nama kabupaten/kota berdasarkan ID kabupaten/kota
+                $selectedRegency = collect($allRegencies)->firstWhere('id', $event->regency_id);
+                $event->regency_name = $selectedRegency['name'] ?? 'N/A';
+            } else {
+                $event->regency_name = 'N/A'; // Jika data tidak ditemukan atau terjadi error
+            }
             return $event;
         });
 
