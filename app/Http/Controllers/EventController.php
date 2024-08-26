@@ -34,7 +34,7 @@ class EventController extends Controller
         // Ambil nama provinsi dan kabupaten/kota dari API
         $events->transform(function ($event) {
             // Ambil data semua provinsi
-            $regionalResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/provinces.json");
+            $regionalResponse = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/provinces.json");
             if ($regionalResponse->status() == 200) {
                 $allProvinces = $regionalResponse->json();
 
@@ -46,7 +46,7 @@ class EventController extends Controller
             }
 
             // Ambil data semua kabupaten/kota berdasarkan ID provinsi
-            $regenciesResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regencies/{$event->regional_id}.json");
+            $regenciesResponse = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/regencies/{$event->regional_id}.json");
             if ($regenciesResponse->status() == 200) {
                 $allRegencies = $regenciesResponse->json();
 
