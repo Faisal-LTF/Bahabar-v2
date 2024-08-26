@@ -1,13 +1,18 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
-import { watchEffect } from "vue";
+import { watchEffect, ref, onMounted } from "vue";
 
 const props = defineProps({
     show: Boolean,
     title: String,
+    provinces: Array, // Terima data provinsi dari props
 });
 
 const emit = defineEmits(["close"]);
+
+const provinces = ref([]);
+const regencies = ref([]);
+
 
 const form = useForm({
     name: "",
@@ -15,6 +20,28 @@ const form = useForm({
     end_date: "",
     voting_type: "gratis", // Default to 'gratis'
     description: "",
+    regional_id: null, // Tambahkan regional_id di form
+    regency_id: null, // Tambahkan regency_id ke dalam form
+});
+
+onMounted(async () => {
+    try {
+        const response = await axios.get('/api/provinces');
+        provinces.value = response.data;
+    } catch (error) {
+        console.error('Error fetching provinces:', error);
+    }
+});
+
+watchEffect(async () => {
+    if (form.regional_id) {
+        try {
+            const response = await axios.get(`/api/regencies/${form.regional_id}`);
+            regencies.value = response.data;
+        } catch (error) {
+            console.error('Error fetching regencies:', error);
+        }
+    }
 });
 
 const create = () => {
@@ -34,6 +61,7 @@ watchEffect(() => {
         form.errors = {};
     }
 });
+
 </script>
 
 <template>
@@ -47,7 +75,18 @@ watchEffect(() => {
                         placeholder="Event Name" />
                     <small v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</small>
                 </div>
-
+                <div class="flex flex-col gap-2">
+                    <label for="regional_id">Provinsi</label>
+                    <Select id="regional_id" v-model="form.regional_id" :options="provinces" optionLabel="name"
+                        optionValue="id" placeholder="Select Province" />
+                    <small v-if="form.errors.regional_id" class="text-red-500">{{ form.errors.regional_id }}</small>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <label for="regency_id">Kabupaten/Kota</label>
+                    <Select id="regency_id" v-model="form.regency_id" :options="regencies" optionLabel="name"
+                        optionValue="id" placeholder="Select Regency" />
+                    <small v-if="form.errors.regency_id" class="text-red-500">{{ form.errors.regency_id }}</small>
+                </div>
                 <div class="flex flex-col gap-2">
                     <label for="start_date">Start Date</label>
                     <InputText id="start_date" v-model="form.start_date" type="date" placeholder="Start Date" />

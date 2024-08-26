@@ -104,6 +104,13 @@ const formatDate = (date) => {
                     </template>
                 </Column>
                 <Column field="name" header="Name"></Column>
+
+                <!-- Tampilkan nama provinsi -->
+                <Column field="regional_name" header="Provinsi"></Column>
+
+                <!-- Tampilkan nama kabupaten/kota -->
+                <Column field="regency_name" header="Kab/Kota"></Column>
+
                 <Column field="start_date" header="Start Date"></Column>
                 <Column field="end_date" header="End Date"></Column>
                 <Column field="voting_type" header="Voting Type"></Column>

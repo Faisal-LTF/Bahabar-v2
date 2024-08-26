@@ -3,8 +3,10 @@
 use App\Models\User;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Spatie\Permission\Models\Permission;
@@ -27,6 +29,7 @@ use App\Http\Controllers\PermissionController;
 Route::get('/', function () {
     return redirect('login');
 });
+
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard', [
@@ -77,6 +80,9 @@ Route::get('/button', function () {
 Route::get('/list', function () {
     return Inertia::render('SakaiList');
 });
+Route::get('/api/provinces', [ApiController::class, 'getProvinces']);
+Route::get('/api/regencies/{provinceId}', [ApiController::class, 'getRegencies']);
+
 
 // Route::get('/', function () {
 //     return Inertia::render('Welcome', [

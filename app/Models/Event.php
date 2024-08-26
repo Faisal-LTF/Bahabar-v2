@@ -20,6 +20,8 @@ class Event extends Model
         'end_date',        // Tanggal berakhir event
         'voting_type',     // Tipe voting
         'description',     // Deskripsi event
+        'regional_id',     // ID provinsi terkait (didapat dari API)
+        'regency_id',      // ID kabupaten/kota terkait (didapat dari API)
     ];
 
     /**

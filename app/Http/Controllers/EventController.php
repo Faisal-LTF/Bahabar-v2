@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use Inertia\Inertia;
 use App\Models\Event;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redirect;
 
 class EventController extends Controller
@@ -30,6 +31,35 @@ class EventController extends Controller
             ->orderBy($request->input('field', 'created_at'), $request->input('order', 'desc'))
             ->paginate($request->input('perPage', 10));
 
+        // Ambil nama provinsi dan kabupaten/kota dari API
+        $events->transform(function ($event) {
+
+            // dd(
+            //     'Event ID: ' . $event->id,
+            //     'Regional ID: ' . $event->regional_id,
+            //     'Regency ID: ' . $event->regency_id,
+            // );
+            // Ambil data regional
+            $regionalResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/provinces/{$event->regional_id}.json");
+            if ($regionalResponse->status() == 200) {
+                $regional = $regionalResponse->json();
+                $event->regional_name = $regional['name'] ?? 'N/A';
+            } else {
+                $event->regional_name = 'N/A'; // ID tidak ditemukan atau error lain
+            }
+
+            // Ambil data regency
+            $regencyResponse = Http::get("https://emsifa.github.io/api-wilayah-indonesia/api/regencies/{$event->regency_id}.json");
+            if ($regencyResponse->status() == 200) {
+                $regency = $regencyResponse->json();
+                $event->regency_name = $regency['name'] ?? 'N/A';
+            } else {
+                $event->regency_name = 'N/A'; // ID tidak ditemukan atau error lain
+            }
+
+            return $event;
+        });
+
         return Inertia::render('Event/Index', [
             'title' => 'Event List',
             'filters' => $request->only('search', 'field', 'order'),
@@ -37,15 +67,22 @@ class EventController extends Controller
         ]);
     }
 
+
     /**
      * Show the form for creating a new event.
      */
     public function create()
     {
+        // Ambil data provinsi dari ApiController
+        $provinces = app(ApiController::class)->getProvinces()->getData();
+
+        // Mengembalikan view untuk halaman pembuatan event dengan data provinsi
         return Inertia::render('Event/Create', [
             'title' => 'Create Event',
+            'provinces' => $provinces,
         ]);
     }
+
 
     /**
      * Store a newly created event in storage.
@@ -55,15 +92,18 @@ class EventController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-            'voting_type' => 'required|in:gratis,berbayar',
+            'end_date' => 'required|date',
+            'voting_type' => 'required|string',
             'description' => 'nullable|string',
+            'regional_id' => 'required|integer', // Validasi ID provinsi
+            'regency_id' => 'required|integer', // Validasi ID kabupaten/kota
         ]);
 
         Event::create($validated);
 
-        return Redirect::route('event.index')->with('success', 'Event created successfully.');
+        return redirect()->route('event.index')->with('success', 'Event created successfully.');
     }
+
 
     /**
      * Show the form for editing the specified event.
