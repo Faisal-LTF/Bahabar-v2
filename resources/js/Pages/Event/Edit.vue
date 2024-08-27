@@ -18,6 +18,7 @@ const form = useForm({
     description: "",
     regional_id: null,
     regency_id: null,
+    status: props.event?.status || "ready",
 });
 
 const provinces = ref([]);
@@ -88,6 +89,7 @@ watchEffect(() => {
         form.description = props.event?.description || "";
         form.regional_id = props.event?.regional_id || null;
         form.regency_id = props.event?.regency_id || null;
+        form.status = props.event?.status || "ready";
     }
 });
 </script>
@@ -151,7 +153,17 @@ watchEffect(() => {
                     <Textarea id="description" v-model="form.description" placeholder="Description" />
                     <small v-if="form.errors.description" class="text-red-500">{{ form.errors.description }}</small>
                 </div>
-
+                <!-- Status -->
+                <div class="flex flex-col gap-2">
+                    <label for="status">Status</label>
+                    <Select id="status" v-model="form.status" :options="[
+                        { label: 'Ready', value: 'Ready' },
+                        { label: 'In Progress', value: 'Progress' },
+                        { label: 'Completed', value: 'Completed' },
+                        { label: 'Cancelled', value: 'Cancelled' }
+                    ]" optionLabel="label" optionValue="value" placeholder="Select Status" />
+                    <small v-if="form.errors.status" class="text-red-500">{{ form.errors.status }}</small>
+                </div>
                 <!-- Buttons -->
                 <div class="flex justify-end gap-2">
                     <Button type="button" label="Cancel" severity="secondary" @click="emit('close')"></Button>

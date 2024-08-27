@@ -22,6 +22,7 @@ const form = useForm({
     description: "",
     regional_id: null, // Tambahkan regional_id di form
     regency_id: null, // Tambahkan regency_id ke dalam form
+    status: "ready",
 });
 
 onMounted(async () => {

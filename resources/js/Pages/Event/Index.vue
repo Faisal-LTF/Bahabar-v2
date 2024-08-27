@@ -73,6 +73,20 @@ const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-GB', options).replace(",", " ");
 };
 
+const getSeverity = (status) => {
+    switch (status) {
+        case 'Ready':
+            return 'info'; // Biru
+        case 'Progress':
+            return 'warn'; // Oranye
+        case 'Completed':
+            return 'success'; // Hijau
+        case 'Cancelled':
+            return 'danger'; // Merah
+        default:
+            return null; // Untuk status yang tidak dikenali
+    }
+};
 </script>
 
 <template>
@@ -83,8 +97,14 @@ const formatDate = (date) => {
 
             <Button v-show="can(['create event'])" label="Create" @click="data.createOpen = true" icon="pi pi-plus" />
 
-            <DataTable lazy :value="events.data" paginator :rows="events.per_page" :totalRecords="events.total"
-                :first="(events.current_page - 1) * events.per_page" @page="onPageChange" tableStyle="min-width: 50rem">
+            <DataTable ref="dt" v-model:selection="selectedProducts" :value="events.data" :paginator="true"
+                :rows="events.per_page" :totalRecords="events.total"
+                :first="(events.current_page - 1) * events.per_page" @page="onPageChange"
+                paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+                :rowsPerPageOptions="[5, 10, 25]"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                tableStyle="min-width: 50rem">
+
                 <template #header>
                     <div class="flex justify-end">
                         <IconField>
@@ -115,6 +135,18 @@ const formatDate = (date) => {
                 <Column field="end_date" header="End Date"></Column>
                 <Column field="voting_type" header="Voting Type"></Column>
                 <Column field="description" header="Description"></Column>
+                <Column header="Status" field="status" :filterMenuStyle="{ width: '14rem' }" style="min-width: 12rem">
+                    <template #body="{ data }">
+                        <Tag :value="data.status" :severity="getSeverity(data.status)" />
+                    </template>
+                    <template #filter="{ filterModel }">
+                        <Select v-model="filterModel.value" :options="statuses" placeholder="Select One" showClear>
+                            <template #option="slotProps">
+                                <Tag :value="slotProps.option" :severity="getSeverity(slotProps.option)" />
+                            </template>
+                        </Select>
+                    </template>
+                </Column>
                 <!-- <Column field="created_at" header="Created">
                     <template #body="slotProps">
                         {{ formatDate(slotProps.data.created_at) }}

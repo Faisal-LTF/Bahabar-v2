@@ -89,6 +89,8 @@ class EventController extends Controller
             'description' => 'nullable|string',
             'regional_id' => 'required|integer',
             'regency_id' => 'required|integer',
+            'status' => 'required|string',
+
         ]);
 
         $event->update($validated);

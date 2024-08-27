@@ -22,6 +22,7 @@ class Event extends Model
         'description',     // Deskripsi event
         'regional_id',     // ID provinsi terkait (didapat dari API)
         'regency_id',      // ID kabupaten/kota terkait (didapat dari API)
+        'status',
     ];
 
     /**
