@@ -12,16 +12,12 @@ class EventController extends Controller
 {
     public function __construct()
     {
-        // Middleware untuk izin
         $this->middleware('permission:create event', ['only' => ['create', 'store']]);
         $this->middleware('permission:read event', ['only' => ['index', 'show']]);
         $this->middleware('permission:update event', ['only' => ['edit', 'update']]);
         $this->middleware('permission:delete event', ['only' => ['destroy']]);
     }
 
-    /**
-     * Display a listing of the events.
-     */
     public function index(Request $request)
     {
         $events = Event::query()
@@ -31,31 +27,9 @@ class EventController extends Controller
             ->orderBy($request->input('field', 'created_at'), $request->input('order', 'desc'))
             ->paginate($request->input('perPage', 10));
 
-        // Ambil nama provinsi dan kabupaten/kota dari API
         $events->transform(function ($event) {
-            // Ambil data semua provinsi
-            $regionalResponse = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/provinces.json");
-            if ($regionalResponse->status() == 200) {
-                $allProvinces = $regionalResponse->json();
-
-                // Cari nama provinsi berdasarkan ID
-                $selectedProvince = collect($allProvinces)->firstWhere('id', $event->regional_id);
-                $event->regional_name = $selectedProvince['name'] ?? 'N/A';
-            } else {
-                $event->regional_name = 'N/A'; // Jika data tidak ditemukan atau terjadi error
-            }
-
-            // Ambil data semua kabupaten/kota berdasarkan ID provinsi
-            $regenciesResponse = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/regencies/{$event->regional_id}.json");
-            if ($regenciesResponse->status() == 200) {
-                $allRegencies = $regenciesResponse->json();
-
-                // Cari nama kabupaten/kota berdasarkan ID kabupaten/kota
-                $selectedRegency = collect($allRegencies)->firstWhere('id', $event->regency_id);
-                $event->regency_name = $selectedRegency['name'] ?? 'N/A';
-            } else {
-                $event->regency_name = 'N/A'; // Jika data tidak ditemukan atau terjadi error
-            }
+            $event->regional_name = $this->fetchProvinceName($event->regional_id);
+            $event->regency_name = $this->fetchRegencyName($event->regional_id, $event->regency_id);
             return $event;
         });
 
@@ -66,26 +40,16 @@ class EventController extends Controller
         ]);
     }
 
-
-    /**
-     * Show the form for creating a new event.
-     */
     public function create()
     {
-        // Ambil data provinsi dari ApiController
-        $provinces = app(ApiController::class)->getProvinces()->getData();
+        $provinces = $this->getProvinces();
 
-        // Mengembalikan view untuk halaman pembuatan event dengan data provinsi
         return Inertia::render('Event/Create', [
             'title' => 'Create Event',
             'provinces' => $provinces,
         ]);
     }
 
-
-    /**
-     * Store a newly created event in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -94,8 +58,8 @@ class EventController extends Controller
             'end_date' => 'required|date',
             'voting_type' => 'required|string',
             'description' => 'nullable|string',
-            'regional_id' => 'required|integer', // Validasi ID provinsi
-            'regency_id' => 'required|integer', // Validasi ID kabupaten/kota
+            'regional_id' => 'required|integer',
+            'regency_id' => 'required|integer',
         ]);
 
         Event::create($validated);
@@ -103,29 +67,28 @@ class EventController extends Controller
         return redirect()->route('event.index')->with('success', 'Event created successfully.');
     }
 
-
-    /**
-     * Show the form for editing the specified event.
-     */
     public function edit(Event $event)
     {
+        // Fetch the names of the province and regency
+        $event->regional_name = $this->fetchProvinceName($event->regional_id);
+        $event->regency_name = $this->fetchRegencyName($event->regional_id, $event->regency_id);
+
         return Inertia::render('Event/Edit', [
             'title' => 'Edit Event',
             'event' => $event,
         ]);
     }
 
-    /**
-     * Update the specified event in storage.
-     */
     public function update(Request $request, Event $event)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'voting_type' => 'required|in:gratis,berbayar',
+            'voting_type' => 'required|string',
             'description' => 'nullable|string',
+            'regional_id' => 'required|integer',
+            'regency_id' => 'required|integer',
         ]);
 
         $event->update($validated);
@@ -133,13 +96,34 @@ class EventController extends Controller
         return Redirect::route('event.index')->with('success', 'Event updated successfully.');
     }
 
-    /**
-     * Remove the specified event from storage.
-     */
     public function destroy(Event $event)
     {
         $event->delete();
 
         return Redirect::route('event.index')->with('success', 'Event deleted successfully.');
+    }
+
+    private function getProvinces()
+    {
+        $response = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/provinces.json");
+        return $response->successful() ? $response->json() : [];
+    }
+
+    private function fetchProvinceName($provinceId)
+    {
+        $provinces = $this->getProvinces();
+        $province = collect($provinces)->firstWhere('id', $provinceId);
+        return $province['name'] ?? 'N/A';
+    }
+
+    private function fetchRegencyName($provinceId, $regencyId)
+    {
+        $response = Http::get("https://faisal-ltf.github.io/api-wilayah-indonesia/api/regencies/{$provinceId}.json");
+        if ($response->successful()) {
+            $regencies = $response->json();
+            $regency = collect($regencies)->firstWhere('id', $regencyId);
+            return $regency['name'] ?? 'N/A';
+        }
+        return 'N/A';
     }
 }

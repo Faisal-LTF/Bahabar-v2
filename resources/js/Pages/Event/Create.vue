@@ -18,7 +18,7 @@ const form = useForm({
     name: "",
     start_date: "",
     end_date: "",
-    voting_type: "gratis", // Default to 'gratis'
+    voting_type: "", // Default to 'gratis'
     description: "",
     regional_id: null, // Tambahkan regional_id di form
     regency_id: null, // Tambahkan regency_id ke dalam form

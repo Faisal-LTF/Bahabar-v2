@@ -115,7 +115,7 @@ const formatDate = (date) => {
                 <Column field="end_date" header="End Date"></Column>
                 <Column field="voting_type" header="Voting Type"></Column>
                 <Column field="description" header="Description"></Column>
-                <Column field="created_at" header="Created">
+                <!-- <Column field="created_at" header="Created">
                     <template #body="slotProps">
                         {{ formatDate(slotProps.data.created_at) }}
                     </template>
@@ -124,7 +124,7 @@ const formatDate = (date) => {
                     <template #body="slotProps">
                         {{ formatDate(slotProps.data.updated_at) }}
                     </template>
-                </Column>
+                </Column> -->
                 <Column :exportable="false" style="min-width: 12rem">
                     <template #body="slotProps">
                         <Button v-show="can(['update event'])" icon="pi pi-pencil" outlined rounded class="mr-2" @click="
