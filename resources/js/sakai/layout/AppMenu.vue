@@ -8,18 +8,15 @@ const model = ref([
         items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/dashboard' }]
     },
     {
-        label: 'Master',
-        items: [{ label: 'User', icon: 'pi pi-fw pi-user', to: '/user', can: 'read user' }]
-    },
-    {
         label: 'Setting',
         items: [
+            { label: 'User', icon: 'pi pi-fw pi-user', to: '/user', can: 'read user' },
             { label: 'Role', icon: 'pi pi-fw pi-id-card', to: '/role', can: 'read role' },
             { label: 'Permission', icon: 'pi pi-fw pi-mobile', to: '/permission', class: 'rotated-icon', can: 'read permission' }
         ]
     },
     {
-        label: 'Events',
+        label: 'Event Managamenet',
         items: [
             { label: 'Events', icon: 'pi pi-fw pi-calendar', to: '/events', can: 'read event' },
             { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates', can: 'read candidate' }
@@ -41,6 +38,7 @@ const model = ref([
 <template>
     <ul class="layout-menu">
         <template v-for="(item, i) in model" :key="item">
+            <hr>
             <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
             <li v-if="item.separator" class="menu-separator"></li>
         </template>
