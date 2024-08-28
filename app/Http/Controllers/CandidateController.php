@@ -59,9 +59,10 @@ class CandidateController extends Controller
             'name' => 'required|string|max:255',
             'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
             'description' => 'nullable|string',
-            'region' => 'required|string|max:255',
             'event_id' => 'required|exists:events,id',
         ]);
+
+        $event = Event::findOrFail($request->event_id);
 
         $path = $request->file('photo')->store('photos', 'public');
 
@@ -69,8 +70,9 @@ class CandidateController extends Controller
             'name' => $request->name,
             'photo' => $path,
             'description' => $request->description,
-            'region' => $request->region,
             'event_id' => $request->event_id,
+            'regional_id' => $event->regional_id, // Otomatis mengambil regional_id dari event
+            'regency_id' => $event->regency_id,   // Otomatis mengambil regency_id dari event
         ]);
 
         return Redirect::route('candidates.index')->with('success', 'Candidate created successfully.');
@@ -99,11 +101,14 @@ class CandidateController extends Controller
             'name' => 'required|string|max:255',
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'description' => 'nullable|string',
-            'region' => 'required|string|max:255',
             'event_id' => 'required|exists:events,id',
         ]);
 
+        $event = Event::findOrFail($request->event_id);
+
         $data = $request->all();
+        $data['regional_id'] = $event->regional_id;
+        $data['regency_id'] = $event->regency_id;
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('photos', 'public');
@@ -114,6 +119,7 @@ class CandidateController extends Controller
 
         return Redirect::route('candidates.index')->with('success', 'Candidate updated successfully.');
     }
+
 
     /**
      * Remove the specified candidate from storage.

@@ -13,8 +13,9 @@ class Candidate extends Model
         'name',
         'photo',
         'description',
-        'region',
         'event_id',
+        'regional_id',
+        'regency_id',
     ];
 
     public function event()

@@ -1,7 +1,7 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
-import { watchEffect, ref, onMounted } from "vue";
-
+import { ref, watch, onMounted } from "vue";
+import axios from "axios";
 
 const props = defineProps({
     show: Boolean,
@@ -13,33 +13,33 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close"]);
-const events = ref([]);
-
-onMounted(async () => {
-    try {
-        const response = await axios.get('/candidates/create');
-        events.value = response.data; // Store the fetched events data
-        console.log('Events:', events.value); // Log the events to ensure data is fetched correctly
-    } catch (error) {
-        console.error('Error fetching events:', error);
-    }
-});
-
+const events = ref(props.events);
 const form = useForm({
     name: "",
-    region: "",
     description: "",
     event_id: null,
+    regional_id: null,
+    regency_id: null,
     photo: null,
 });
 
+onMounted(async () => {
+    if (!events.value.length) {
+        try {
+            const response = await axios.get('/candidates/create');
+            events.value = response.data;
+        } catch (error) {
+            console.error('Error fetching events:', error);
+        }
+    }
+});
 
 const onUpload = (event) => {
     const file = event.files[0];
     form.photo = file;
 };
 
-const create = () => {
+const store = () => {
     form.post(route("candidates.store"), {
         preserveScroll: true,
         onSuccess: () => {
@@ -51,30 +51,46 @@ const create = () => {
     });
 };
 
-watchEffect(() => {
-    if (props.show) {
-        form.errors = {};
+watch(() => form.event_id, (newEventId) => {
+    if (newEventId) {
+        const selectedEvent = events.value.find(event => event.id === newEventId);
+        if (selectedEvent) {
+            form.regional_id = selectedEvent.regional_id;
+            form.regency_id = selectedEvent.regency_id;
+        } else {
+            form.regional_id = null;
+            form.regency_id = null;
+        }
+    } else {
+        form.regional_id = null;
+        form.regency_id = null;
     }
 });
 
+watch(() => props.show, (newVal) => {
+    if (newVal) {
+        form.errors = {};
+        form.name = "";
+        form.description = "";
+        form.event_id = null;
+        form.regional_id = null;
+        form.regency_id = null;
+        form.photo = null;
+    }
+});
 </script>
+
 
 
 <template>
     <Dialog v-model:visible="props.show" position="top" modal :header="'Add ' + props.title" :style="{ width: '30rem' }"
         :closable="false">
-        <form @submit.prevent="create" enctype="multipart/form-data">
+        <form @submit.prevent="store" enctype="multipart/form-data">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
                     <label for="name">Name</label>
                     <InputText id="name" v-model="form.name" class="flex-auto" autocomplete="off" placeholder="Name" />
                     <small v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</small>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label for="region">Region</label>
-                    <InputText id="region" v-model="form.region" class="flex-auto" autocomplete="off"
-                        placeholder="Region" />
-                    <small v-if="form.errors.region" class="text-red-500">{{ form.errors.region }}</small>
                 </div>
                 <div class="flex flex-col gap-2">
                     <label for="event_id">Event</label>
@@ -103,6 +119,7 @@ watchEffect(() => {
         </form>
     </Dialog>
 </template>
+
 
 <style scoped lang="scss">
 /* Add your styles here */

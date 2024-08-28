@@ -106,8 +106,6 @@ const formatDate = (date) => {
                 </Column>
 
                 <Column field="name" header="Name"></Column>
-                <Column field="region" header="Region"></Column>
-
                 <!-- New column for Description -->
                 <Column field="description" header="Description">
                     <template #body="slotProps">
