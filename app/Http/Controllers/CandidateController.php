@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Candidate;
-use App\Models\Event;
-use Illuminate\Http\Request;
+
 use Inertia\Inertia;
+use App\Models\Event;
+use App\Models\Candidate;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 
 class CandidateController extends Controller
@@ -57,67 +59,65 @@ class CandidateController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'required|image|mimes:jpg,jpeg,png|max:2048',
+            'photo' => 'required|image|mimes:jpg,jpeg,png|max:7048',
             'description' => 'nullable|string',
             'event_id' => 'required|exists:events,id',
         ]);
 
         $event = Event::findOrFail($request->event_id);
 
+        // Handle photo upload
         $path = $request->file('photo')->store('photos', 'public');
 
         Candidate::create([
             'name' => $request->name,
-            'photo' => $path,
+            'photo' => $path, // Store the path to the uploaded photo
             'description' => $request->description,
             'event_id' => $request->event_id,
-            'regional_id' => $event->regional_id, // Otomatis mengambil regional_id dari event
-            'regency_id' => $event->regency_id,   // Otomatis mengambil regency_id dari event
+            'regional_id' => $event->regional_id,
+            'regency_id' => $event->regency_id,
         ]);
 
         return Redirect::route('candidates.index')->with('success', 'Candidate created successfully.');
     }
 
+
     /**
      * Show the form for editing the specified candidate.
      */
+
     public function edit(Candidate $candidate)
     {
-        $events = Event::all();
+        // Mengambil hanya event yang berstatus 'Ready'
+        $events = Event::where('status', 'Ready')->get(['id', 'name', 'status']);
 
         return Inertia::render('Candidate/Edit', [
-            'title' => 'Edit Candidate',
             'candidate' => $candidate,
             'events' => $events,
         ]);
     }
-
     /**
      * Update the specified candidate in storage.
      */
     public function update(Request $request, Candidate $candidate)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'description' => 'nullable|string',
-            'event_id' => 'required|exists:events,id',
+            'event_id' => 'nullable|exists:events,id',
+            'regional_id' => 'nullable|exists:regionals,id',
+            'regency_id' => 'nullable|exists:regencies,id',
+            'photo' => 'nullable|image|max:7048', // Validasi file foto
         ]);
 
-        $event = Event::findOrFail($request->event_id);
-
-        $data = $request->all();
-        $data['regional_id'] = $event->regional_id;
-        $data['regency_id'] = $event->regency_id;
-
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('photos', 'public');
-            $data['photo'] = $path;
+            // Proses upload foto
+            $path = $request->file('photo')->store('public/photos');
+            $data['photo'] = Storage::url($path);
         }
-
         $candidate->update($data);
 
-        return Redirect::route('candidates.index')->with('success', 'Candidate updated successfully.');
+        return redirect()->route('candidates.index')->with('success', 'Candidate updated successfully.');
     }
 
 

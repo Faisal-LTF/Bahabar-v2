@@ -78,7 +78,8 @@ const formatDate = (date) => {
     <app-layout>
         <div class="card">
             <Create :show="data.createOpen" @close="data.createOpen = false" :title="props.title" />
-            <Edit :show="data.editOpen" @close="data.editOpen = false" :event="data.event" :title="props.title" />
+            <Edit :show="data.editOpen" @close="data.editOpen = false" :candidate="data.candidate"
+                :title="props.title" />
 
             <Button v-show="can(['create candidate'])" label="Create" @click="data.createOpen = true"
                 icon="pi pi-plus" />

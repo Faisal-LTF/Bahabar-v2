@@ -97,9 +97,8 @@ const getSeverity = (status) => {
 
             <Button v-show="can(['create event'])" label="Create" @click="data.createOpen = true" icon="pi pi-plus" />
 
-            <DataTable ref="dt" v-model:selection="selectedProducts" :value="events.data" :paginator="true"
-                :rows="events.per_page" :totalRecords="events.total"
-                :first="(events.current_page - 1) * events.per_page" @page="onPageChange"
+            <DataTable ref="dt" :value="events.data" :paginator="true" :rows="events.per_page"
+                :totalRecords="events.total" :first="(events.current_page - 1) * events.per_page" @page="onPageChange"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 :rowsPerPageOptions="[5, 10, 25]"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"

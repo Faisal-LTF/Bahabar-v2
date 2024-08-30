@@ -96,7 +96,7 @@ watchEffect(() => {
 
 <template>
     <Dialog v-model:visible="props.show" position="top" modal :header="'Update ' + props.title"
-        :style="{ width: '30rem' }" :closable="false">
+        :style="{ width: '35rem' }" :closable="false">
         <form @submit.prevent="update">
             <div class="flex flex-col gap-4">
                 <!-- Event Name -->
