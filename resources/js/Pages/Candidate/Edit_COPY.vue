@@ -1,9 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 import { ref, onMounted, watchEffect, computed } from "vue";
-import { useToast } from 'primevue/usetoast';
-
-const toast = useToast();
 
 // Mendefinisikan properti yang diterima oleh komponen
 const props = defineProps({
@@ -34,10 +31,8 @@ const form = useForm({
 // Fungsi untuk menangani upload file
 const onUpload = (event) => {
     const file = event.files[0];  // Mengambil file dari event.files, bukan event.target.files
-
     if (file) {
         form.photo = file;  // Menyimpan file ke form.photo
-        toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
     }
 };
 
@@ -107,17 +102,23 @@ const update = () => {
     <Dialog v-model:visible="props.show" position="top" modal :header="'Update ' + props.title"
         :style="{ width: '35rem' }" :closable="false">
         <form @submit.prevent="update">
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-4">
                 <!-- Bagian upload dan ganti foto kandidat -->
                 <label for="photo">Foto Kandidat :</label>
-                <div v-if="props.candidate?.photo" class="photo-container mb-2">
+                <div v-if="props.candidate?.photo" class="photo-container mb-4">
                     <img :src="'/storage/' + props.candidate.photo" alt="Candidate Photo"
                         class="w-50 h-50 object-cover mb-2" />
                 </div>
 
                 <!-- Input untuk mengganti foto -->
+                <label>Ganti Foto Kandidat :</label>
+                <!-- <div>
+                    <input type="file" @change="form.photo = $event.target.files[0]">
+                    <small v-if="form.errors.photo" class="text-red-500">{{ form.errors.photo }}</small>
+                </div> -->
+
                 <div class="card">
-                    <div class="font-semibold text-xl mb-2">Ganti Foto Kandidat :</div>
+                    <div class="font-semibold text-xl mb-4">Ganti Foto Kandidat :</div>
                     <FileUpload name="photo" @uploader="onUpload" accept="image/*" :maxFileSize="1000000"
                         customUpload />
                     <small v-if="form.errors.photo" class="text-red-500">{{ form.errors.photo }}</small>
@@ -143,8 +144,7 @@ const update = () => {
                 <!-- Description -->
                 <div class="flex flex-col gap-2">
                     <label for="description">Description</label>
-                    <Textarea id="description" v-model="form.description"
-                        class="w-full h-60 p-4 text-base border rounded-lg" placeholder="Description" />
+                    <Textarea id="description" v-model="form.description" placeholder="Description" />
                     <small v-if="form.errors.description" class="text-red-500">{{ form.errors.description }}</small>
                 </div>
 

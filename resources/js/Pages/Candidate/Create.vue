@@ -1,7 +1,11 @@
 <script setup>
 import { useForm } from "@inertiajs/vue3";
 import { ref, watch, onMounted } from "vue";
-import axios from "axios";
+
+import { useToast } from 'primevue/usetoast';
+
+const toast = useToast();
+
 
 const props = defineProps({
     show: Boolean,
@@ -37,6 +41,8 @@ onMounted(async () => {
 const onUpload = (event) => {
     const file = event.files[0];
     form.photo = file;
+    toast.add({ severity: 'info', summary: 'Success', detail: 'File Uploaded', life: 3000 });
+
 };
 
 const store = () => {
@@ -118,6 +124,8 @@ watch(() => props.show, (newVal) => {
             </div>
         </form>
     </Dialog>
+
+
 </template>
 
 
