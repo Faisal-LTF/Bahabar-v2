@@ -43,7 +43,8 @@ class CandidateController extends Controller
     // Show form for creating new candidate
     public function create()
     {
-        $events = Event::all(['id', 'name']);
+        // Mendapatkan event yang hanya berstatus 'ready'
+        $events = Event::where('status', 'ready')->get(['id', 'name']);
         return response()->json($events); // Return as JSON for frontend
     }
 
