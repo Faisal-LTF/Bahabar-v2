@@ -19,7 +19,8 @@ const model = ref([
         label: 'Event Managamenet',
         items: [
             { label: 'Events', icon: 'pi pi-fw pi-calendar', to: '/events', can: 'read event' },
-            { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates', can: 'read candidate' }
+            { label: 'Candidates', icon: 'pi pi-fw pi-users', to: '/candidates', can: 'read candidate' },
+            { label: 'Votes', icon: 'pi pi-fw pi-chart-line', to: '/votes', can: 'read vote' }
         ]
     },
     {
