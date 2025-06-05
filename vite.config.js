@@ -20,6 +20,8 @@ export default defineConfig({
         }),
         Components({
             resolvers: [PrimeVueResolver()]
-        })
+        }),
+
     ],
+
 });
