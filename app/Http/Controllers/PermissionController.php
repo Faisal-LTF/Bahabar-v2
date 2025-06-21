@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
-use App\Models\Permission;
-use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Requests\PermissionIndexRequest;
@@ -54,7 +53,7 @@ class PermissionController extends Controller
             $superadmin = Role::whereName('superadmin')->first();
             $superadmin->givePermissionTo([$request->name]);
             DB::commit();
-            return back()->with('success', $permission->name. ' created successfully.');
+            return back()->with('success', $permission->name . ' created successfully.');
         } catch (\Throwable $th) {
             DB::rollback();
             return back()->with('error', 'Error creating ' .  $th->getMessage());
@@ -72,7 +71,7 @@ class PermissionController extends Controller
             ]);
             $superadmin->givePermissionTo([$permission->name]);
             DB::commit();
-            return back()->with('success',  $permission->name. ' updated successfully.');
+            return back()->with('success',  $permission->name . ' updated successfully.');
         } catch (\Throwable $th) {
             DB::rollback();
             return back()->with('error', 'Error updating ' .  $th->getMessage());
@@ -87,7 +86,7 @@ class PermissionController extends Controller
             $superadmin->revokePermissionTo([$permission->name]);
             $permission->delete();
             DB::commit();
-            return back()->with('success', $permission->name. ' deleted successfully.');
+            return back()->with('success', $permission->name . ' deleted successfully.');
         } catch (\Throwable $th) {
             DB::rollback();
             return back()->with('error', 'Error deleting ' . $permission->name . $th->getMessage());

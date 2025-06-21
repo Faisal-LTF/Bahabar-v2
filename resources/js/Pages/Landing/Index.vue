@@ -1,13 +1,8 @@
 <script setup>
-const smoothScroll = (id) => {
-    document.body.click();
-    document.querySelector(id).scrollIntoView({
-        behavior: 'smooth'
-    });
-};
 
 import { ref, onMounted } from "vue";
 import { ProductService } from '@/sakai/service/ProductService';
+import { PhotoService } from '@/sakai/service/PhotoService';
 
 onMounted(() => {
     ProductService.getProductsSmall().then((data) => (products.value = data.slice(0, 9)));
@@ -53,6 +48,53 @@ const getSeverity = (status) => {
     }
 };
 
+
+
+onMounted(() => {
+    PhotoService.getImages().then((data) => (images.value = data));
+});
+
+const images = ref();
+const responsiveOptionsImage = ref([
+    {
+        breakpoint: '991px',
+        numVisible: 4
+    },
+    {
+        breakpoint: '767px',
+        numVisible: 3
+    },
+    {
+        breakpoint: '575px',
+        numVisible: 1
+    }
+]);
+
+
+const smoothScroll = (id) => {
+    document.body.click();
+    document.querySelector(id).scrollIntoView({
+        behavior: 'smooth'
+    });
+};
+
+
+const currentSlide = ref(0);
+const totalSlides = ref(4);
+
+const nextSlide = () => {
+    currentSlide.value = (currentSlide.value + 1) % totalSlides.value;
+};
+
+const prevSlide = () => {
+    currentSlide.value = currentSlide.value === 0 ? totalSlides.value - 1 : currentSlide.value - 1;
+};
+
+const goToSlide = (index) => {
+    currentSlide.value = index;
+};
+
+
 </script>
 
 <template>
@@ -73,7 +115,192 @@ const getSeverity = (status) => {
                     <img src="/demo/images/landing/vote.png" alt="Hero Image" class="w-4/12 md:w-4/12" />
                 </div>
             </div>
-            <div id="features" class="py-6 px-6 lg:px-20 mt-8 mx-0 lg:mx-20">
+
+            <div id="highlights" class="py-6 px-6 lg:px-20 mx-0 my-12 lg:mx-20">
+                <div class="text-center">
+                    <div class="text-surface-900 light:text-surface-0 font-normal mb-2 text-4xl">Event Spektakuler!
+                    </div>
+                    <span class="text-muted-color text-2xl">Cari event dan pilih kandidat mu ....</span>
+                </div>
+                <div class="card">
+                    <Carousel :value="products" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions">
+                        <template #item="slotProps">
+                            <div class="border border-surface-200 dark:border-surface-700 rounded m-2  p-4">
+                                <div class="mb-4">
+                                    <div class="relative mx-auto">
+                                        <img :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.data.image"
+                                            :alt="slotProps.data.name" class="w-full rounded" />
+                                        <Tag :value="slotProps.data.inventoryStatus"
+                                            :severity="getSeverity(slotProps.data.inventoryStatus)" class="absolute"
+                                            style="left:5px; top: 5px" />
+                                    </div>
+                                </div>
+                                <div class="mb-4 font-medium">{{ slotProps.data.name }}</div>
+                                <div class="flex justify-between items-center">
+                                    <div class="mt-0 font-semibold text-xl">${{ slotProps.data.price }}</div>
+                                    <span>
+                                        <Button icon="pi pi-heart" severity="secondary" outlined />
+                                        <Button icon="pi pi-shopping-cart" class="ml-2" />
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
+                    </Carousel>
+                </div>
+            </div>
+            <div id="features" class="py-6 px-6 lg:px-20  mx-0 lg:mx-20">
+                <!-- Container dengan navigasi -->
+                <div class="relative">
+                    <!-- Tombol navigasi kiri -->
+                    <button @click="prevSlide"
+                        class="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors">
+                        <i class="pi pi-chevron-left text-gray-600"></i>
+                    </button>
+
+                    <!-- Tombol navigasi kanan -->
+                    <button @click="nextSlide"
+                        class="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white shadow-lg rounded-full p-3 hover:bg-gray-50 transition-colors">
+                        <i class="pi pi-chevron-right text-gray-600"></i>
+                    </button>
+
+                    <!-- Container testimonial -->
+                    <div class="overflow-hidden mx-12">
+                        <div class="flex transition-transform duration-500 ease-in-out"
+                            :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
+
+                            <!-- Item 1 -->
+                            <div class="w-full flex-shrink-0 px-6">
+                                <div class="max-w-4xl mx-auto mt-5 mb-5 p-6 md:p-12"
+                                    style="border-radius: 20px; background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #efe1af 0%, #c3dcfa 100%)">
+                                    <div
+                                        class="flex flex-col lg:flex-row justify-center items-center text-center lg:text-left px-4 py-6 lg:px-8 lg:py-8 gap-8">
+                                        <div class="flex-1">
+                                            <div class="text-gray-900 mb-2 text-3xl md:text-4xl font-semibold">Joséphine
+                                                Miller
+                                            </div>
+                                            <span class="text-gray-600 text-xl md:text-2xl">Peak Interactive</span>
+                                            <p class="text-gray-900 text-lg md:text-xl mt-6 leading-relaxed">
+                                                "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                                                dolore eu
+                                                fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
+                                                sunt in culpa
+                                                qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis
+                                                unde omnis iste
+                                                natus error sit voluptatem."
+                                            </p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div
+                                                class="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
+                                                JM
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Item 2 -->
+                            <div class="w-full flex-shrink-0 px-6">
+                                <div class="max-w-4xl mx-auto mt-5 mb-5 p-6 md:p-12"
+                                    style="border-radius: 20px; background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #c3dcfa 0%, #efe1af 100%)">
+                                    <div
+                                        class="flex flex-col lg:flex-row justify-center items-center text-center lg:text-left px-4 py-6 lg:px-8 lg:py-8 gap-8">
+                                        <div class="flex-1">
+                                            <div class="text-gray-900 mb-2 text-3xl md:text-4xl font-semibold">John
+                                                Anderson</div>
+                                            <span class="text-gray-600 text-xl md:text-2xl">Tech Solutions</span>
+                                            <p class="text-gray-900 text-lg md:text-xl mt-6 leading-relaxed">
+                                                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                                                tempor
+                                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                                quis nostrud
+                                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat
+                                                duis aute irure
+                                                dolor in reprehenderit."
+                                            </p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div
+                                                class="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
+                                                JA
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Item 3 -->
+                            <div class="w-full flex-shrink-0 px-6">
+                                <div class="max-w-4xl mx-auto mt-5 mb-5 p-6 md:p-12"
+                                    style="border-radius: 20px; background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #fac3dc 0%, #c3dcfa 100%)">
+                                    <div
+                                        class="flex flex-col lg:flex-row justify-center items-center text-center lg:text-left px-4 py-6 lg:px-8 lg:py-8 gap-8">
+                                        <div class="flex-1">
+                                            <div class="text-gray-900 mb-2 text-3xl md:text-4xl font-semibold">Sarah
+                                                Johnson</div>
+                                            <span class="text-gray-600 text-xl md:text-2xl">Digital Agency</span>
+                                            <p class="text-gray-900 text-lg md:text-xl mt-6 leading-relaxed">
+                                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
+                                                ut aliquip
+                                                ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+                                                voluptate velit
+                                                esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat
+                                                cupidatat non
+                                                proident sunt in culpa."
+                                            </p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div
+                                                class="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
+                                                SJ
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Item 4 -->
+                            <div class="w-full flex-shrink-0 px-6">
+                                <div class="max-w-4xl mx-auto mt-5 mb-5 p-6 md:p-12"
+                                    style="border-radius: 20px; background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #afe1ef 0%, #fac3dc 100%)">
+                                    <div
+                                        class="flex flex-col lg:flex-row justify-center items-center text-center lg:text-left px-4 py-6 lg:px-8 lg:py-8 gap-8">
+                                        <div class="flex-1">
+                                            <div class="text-gray-900 mb-2 text-3xl md:text-4xl font-semibold">Michael
+                                                Chen</div>
+                                            <span class="text-gray-600 text-xl md:text-2xl">StartUp Inc</span>
+                                            <p class="text-gray-900 text-lg md:text-xl mt-6 leading-relaxed">
+                                                "Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                                                accusantium
+                                                doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
+                                                inventore
+                                                veritatis et quasi architecto beatae vitae dicta sunt explicabo nemo
+                                                enim ipsam
+                                                voluptatem quia voluptas."
+                                            </p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div
+                                                class="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-2xl font-bold">
+                                                MC
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Dots indicator -->
+                    <div class="flex justify-center space-x-2 mt-6">
+                        <button v-for="(item, index) in 4" :key="index" @click="goToSlide(index)"
+                            :class="currentSlide === index ? 'bg-green-500' : 'bg-gray-300'"
+                            class="w-3 h-3 rounded-full transition-colors hover:bg-green-400">
+                        </button>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-12 gap-4 justify-center">
                     <div class="col-span-12 text-center mt-20 mb-6">
                         <div class="text-surface-900 light:text-surface-0 font-normal mb-2 text-4xl">Marvelous Features
@@ -189,7 +416,6 @@ const getSeverity = (status) => {
                             </div>
                         </div>
                     </div>
-
                     <div class="col-span-12 md:col-span-12 lg:col-span-4 p-0 lg:pr-8 mt-6 lg:mt-0">
                         <div
                             style="height: 160px; padding: 2px; border-radius: 10px; background: linear-gradient(90deg, rgba(145, 210, 204, 0.2), rgba(212, 162, 221, 0.2)), linear-gradient(180deg, rgba(251, 199, 145, 0.2), rgba(160, 210, 250, 0.2))">
@@ -207,7 +433,6 @@ const getSeverity = (status) => {
                             </div>
                         </div>
                     </div>
-
                     <div class="col-span-12 md:col-span-12 lg:col-span-4 p-0 lg-4 mt-6 lg:mt-0">
                         <div
                             style="height: 160px; padding: 2px; border-radius: 10px; background: linear-gradient(90deg, rgba(160, 210, 250, 0.2), rgba(212, 162, 221, 0.2)), linear-gradient(180deg, rgba(246, 158, 188, 0.2), rgba(212, 162, 221, 0.2))">
@@ -223,57 +448,7 @@ const getSeverity = (status) => {
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-span-12 mt-20 mb-20 p-2 md:p-20"
-                        style="border-radius: 20px; background: linear-gradient(0deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), radial-gradient(77.36% 256.97% at 77.36% 57.52%, #efe1af 0%, #c3dcfa 100%)">
-                        <div class="flex flex-col justify-center items-center text-center px-4 py-4 md:py-0">
-                            <div class="text-gray-900 mb-2 text-3xl font-semibold">Joséphine Miller</div>
-                            <span class="text-gray-600 text-2xl">Peak Interactive</span>
-                            <p class="text-gray-900 sm:line-height-2 md:line-height-4 text-2xl mt-6"
-                                style="max-width: 800px">
-                                “Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                                nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui
-                                officia deserunt mollit anim id est laborum.”
-                            </p>
-                            <img src="/demo/images/landing/peak-logo.svg" class="mt-6" alt="Company logo" />
-                        </div>
-                    </div>
                 </div>
-            </div>
-
-            <div id="highlights" class="py-6 px-6 lg:px-20 mx-0 my-12 lg:mx-20">
-                <div class="text-center">
-                    <div class="text-surface-900 light:text-surface-0 font-normal mb-2 text-4xl">Event Spektakuler!
-                    </div>
-                    <span class="text-muted-color text-2xl">Cari event dan pilih kandidat mu ....</span>
-                </div>
-
-                <div class="card">
-                    <Carousel :value="products" :numVisible="3" :numScroll="1" :responsiveOptions="responsiveOptions">
-                        <template #item="slotProps">
-                            <div class="border border-surface-200 dark:border-surface-700 rounded m-2  p-4">
-                                <div class="mb-4">
-                                    <div class="relative mx-auto">
-                                        <img :src="'https://primefaces.org/cdn/primevue/images/product/' + slotProps.data.image"
-                                            :alt="slotProps.data.name" class="w-full rounded" />
-                                        <Tag :value="slotProps.data.inventoryStatus"
-                                            :severity="getSeverity(slotProps.data.inventoryStatus)" class="absolute"
-                                            style="left:5px; top: 5px" />
-                                    </div>
-                                </div>
-                                <div class="mb-4 font-medium">{{ slotProps.data.name }}</div>
-                                <div class="flex justify-between items-center">
-                                    <div class="mt-0 font-semibold text-xl">${{ slotProps.data.price }}</div>
-                                    <span>
-                                        <Button icon="pi pi-heart" severity="secondary" outlined />
-                                        <Button icon="pi pi-shopping-cart" class="ml-2" />
-                                    </span>
-                                </div>
-                            </div>
-                        </template>
-                    </Carousel>
-                </div>
-
             </div>
             <div class="py-6 px-6 mx-0 mt-20 lg:mx-20">
                 <div class="grid grid-cols-12 gap-4">
